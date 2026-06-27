@@ -16,9 +16,24 @@
   "build": {
     "appId": "com.tickly.app",
     "productName": "Tickly",
-    "directories": { "output": "release", "buildResources": "build" },
-    "files": ["out/**/*", "package.json"],
-    "mac": { "icon": "build/icon.icns" }
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "npmRebuild": false,
+    "mac": {
+      "icon": "build/icon.icns",
+      "target": "zip",
+      "identity": null,
+      "artifactName": "${productName}-mac-${arch}.zip"
+    }
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
@@ -44,6 +59,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^33.2.0",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^2.3.0",
     "tailwindcss": "^4.3.1",
     "typescript": "^5.7.2",
