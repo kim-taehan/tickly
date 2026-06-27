@@ -1,4 +1,4 @@
-import type { Stock, Quote, SearchItem, Candle, Condition, NewCondition, AlertHistory, Settings } from '../shared/types'
+import type { Stock, Quote, SearchItem, Candle, Condition, NewCondition, AlertHistory, Settings, UpdateCheckResult } from '../shared/types'
 
 export interface WatchlistApi {
   list(): Promise<Stock[]>
@@ -47,6 +47,11 @@ export interface MainApi {
   onSelect(cb: (code: string) => void): () => void
 }
 
+export interface AppApi {
+  version(): Promise<string>
+  checkForUpdates(): Promise<UpdateCheckResult>
+}
+
 declare global {
   interface Window {
     tickly: {
@@ -59,6 +64,7 @@ declare global {
       settings: SettingsApi
       widget: WidgetApi
       main: MainApi
+      app: AppApi
     }
   }
 }

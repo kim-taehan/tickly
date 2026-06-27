@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ComposedChart, Line, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 import type { Candle } from '../../../shared/types'
 import { won } from '../lib/format'
@@ -8,6 +8,14 @@ type Timeframe = 'intraday' | 'daily'
 export default function StockChart({ code }: { code: string }) {
   const [tf, setTf] = useState<Timeframe>('intraday')
   const [data, setData] = useState<Candle[]>([])
+
+  // 선택 기간(당일/60일)의 종가 기준 최소·최대·평균
+  const stats = useMemo(() => {
+    if (data.length === 0) return null
+    const closes = data.map((d) => d.close)
+    const sum = closes.reduce((a, b) => a + b, 0)
+    return { min: Math.min(...closes), max: Math.max(...closes), avg: Math.round(sum / closes.length) }
+  }, [data])
 
   useEffect(() => {
     let alive = true
@@ -34,10 +42,22 @@ export default function StockChart({ code }: { code: string }) {
           </button>
         ))}
       </div>
-      {data.length === 0 ? (
+      {data.length === 0 || !stats ? (
         <div className="h-64 grid place-items-center text-sm text-gray-400">차트 로딩…</div>
       ) : (
-        <ResponsiveContainer width="100%" height={256}>
+        <>
+          <div className="flex gap-4 mb-2 text-xs tabular-nums">
+            <span className="text-gray-500">
+              최소 <span className="text-blue-600 font-medium">{won(stats.min)}</span>
+            </span>
+            <span className="text-gray-500">
+              최대 <span className="text-red-600 font-medium">{won(stats.max)}</span>
+            </span>
+            <span className="text-gray-500">
+              평균 <span className="text-gray-800 font-medium">{won(stats.avg)}</span>
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={256}>
           <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
@@ -53,7 +73,8 @@ export default function StockChart({ code }: { code: string }) {
             <Bar yAxisId="vol" dataKey="volume" name="거래량" fill="#e2e8f0" />
             <Line yAxisId="price" type="monotone" dataKey="close" name="가격" stroke="#4f46e5" dot={false} strokeWidth={1.5} />
           </ComposedChart>
-        </ResponsiveContainer>
+          </ResponsiveContainer>
+        </>
       )}
     </div>
   )

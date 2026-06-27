@@ -8,6 +8,7 @@ import { registerConditionsIpc } from './ipc/conditionsIpc'
 import { registerAlertsIpc } from './ipc/alertsIpc'
 import { registerSettingsIpc } from './ipc/settingsIpc'
 import { registerWidgetIpc } from './ipc/widgetIpc'
+import { registerAppIpc } from './ipc/appIpc'
 import { startQuoteScheduler } from './services/quoteScheduler'
 import { setMainWindow, toggleClickThrough, openWidget } from './services/widgetWindow'
 import log from './services/logger'
@@ -58,6 +59,7 @@ app.whenReady().then(() => {
   registerAlertsIpc()
   registerSettingsIpc()
   registerWidgetIpc()
+  registerAppIpc()
   createWindow()
   openWidget() // 시작 시 위젯 자동 오픈
 

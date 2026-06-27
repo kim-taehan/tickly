@@ -5,13 +5,26 @@ import { INTERVAL_OPTIONS, intervalLabel } from '../../../shared/settings'
 
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const [settings, setSettings] = useState<Settings | null>(null)
+  const [version, setVersion] = useState('')
+  const [updateMsg, setUpdateMsg] = useState('')
+  const [checking, setChecking] = useState(false)
 
   useEffect(() => {
     window.tickly.settings.get().then(setSettings)
+    window.tickly.app.version().then(setVersion)
   }, [])
 
   const update = (patch: Partial<Settings>): void => {
     window.tickly.settings.set(patch).then(setSettings)
+  }
+
+  const checkUpdate = (): void => {
+    setChecking(true)
+    setUpdateMsg('')
+    window.tickly.app
+      .checkForUpdates()
+      .then((r) => setUpdateMsg(r.message))
+      .finally(() => setChecking(false))
   }
 
   return (
@@ -52,6 +65,20 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 className="size-4"
               />
             </label>
+
+            <div className="pt-3 border-t border-gray-100">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-700">버전 {version && `v${version}`}</span>
+                <button
+                  onClick={checkUpdate}
+                  disabled={checking}
+                  className="h-8 px-3 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                >
+                  {checking ? '확인 중…' : '업데이트 확인'}
+                </button>
+              </div>
+              {updateMsg && <p className="mt-2 text-xs text-gray-500">{updateMsg}</p>}
+            </div>
           </div>
         )}
       </div>

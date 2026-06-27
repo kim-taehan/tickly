@@ -15,6 +15,13 @@ export default function App() {
     window.tickly.watchlist.list().then(setStocks)
   }, [])
 
+  // 제목창에 버전 표시: "Tickly (0.0.3)"
+  useEffect(() => {
+    window.tickly.app.version().then((v) => {
+      document.title = `Tickly (${v})`
+    })
+  }, [])
+
   // 위젯에서 종목 클릭 → 메인이 해당 종목 선택
   useEffect(() => {
     return window.tickly.main.onSelect(setSelectedCode)

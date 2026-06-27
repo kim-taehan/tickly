@@ -53,6 +53,14 @@ export interface Settings {
   widgetBounds?: { x: number; y: number; width: number; height: number }
 }
 
+// 수동 업데이트 확인 결과.
+export interface UpdateCheckResult {
+  current: string
+  latest?: string
+  status: 'dev' | 'latest' | 'downloading' | 'error'
+  message: string
+}
+
 // 알림 이력 한 건.
 export interface AlertHistory {
   id: number
