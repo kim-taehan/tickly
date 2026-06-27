@@ -11,6 +11,7 @@ import { registerWidgetIpc } from './ipc/widgetIpc'
 import { startQuoteScheduler } from './services/quoteScheduler'
 import { setMainWindow, toggleClickThrough } from './services/widgetWindow'
 import log from './services/logger'
+import { initAutoUpdate } from './services/autoUpdate'
 
 // 앱 이름 (알림 출처 등). 메뉴바 굵은 이름은 패키징해야 완전히 바뀜.
 app.setName('Tickly')
@@ -58,6 +59,9 @@ app.whenReady().then(() => {
   registerSettingsIpc()
   registerWidgetIpc()
   createWindow()
+
+  // 패키징된 앱에서만 자동 업데이트 확인 (dev에선 no-op)
+  if (app.isPackaged) initAutoUpdate()
 
   // 위젯 Click-through 토글 단축키
   globalShortcut.register('CommandOrControl+Shift+T', toggleClickThrough)

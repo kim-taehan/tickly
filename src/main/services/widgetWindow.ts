@@ -29,8 +29,9 @@ function saveBounds(): void {
 
 function createWidgetWindow(): void {
   const saved = settingsRepo.get().widgetBounds
-  const width = saved?.width ?? 240
-  const height = saved?.height ?? 320
+  // 최초 기본은 컴팩트하게. 종목 많으면 내부 스크롤, 사용자가 키우면 크기 기억.
+  const width = saved?.width ?? 200
+  const height = saved?.height ?? 150
 
   // 저장 위치 없으면 메인 창이 있는 디스플레이의 우상단에 배치 (다중 모니터 대응)
   const wa = (main ? screen.getDisplayMatching(main.getBounds()) : screen.getPrimaryDisplay()).workArea
