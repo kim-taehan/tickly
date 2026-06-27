@@ -9,7 +9,7 @@ import { registerAlertsIpc } from './ipc/alertsIpc'
 import { registerSettingsIpc } from './ipc/settingsIpc'
 import { registerWidgetIpc } from './ipc/widgetIpc'
 import { startQuoteScheduler } from './services/quoteScheduler'
-import { setMainWindow, toggleClickThrough } from './services/widgetWindow'
+import { setMainWindow, toggleClickThrough, openWidget } from './services/widgetWindow'
 import log from './services/logger'
 import { initAutoUpdate } from './services/autoUpdate'
 
@@ -59,6 +59,7 @@ app.whenReady().then(() => {
   registerSettingsIpc()
   registerWidgetIpc()
   createWindow()
+  openWidget() // 시작 시 위젯 자동 오픈
 
   // 패키징된 앱에서만 자동 업데이트 확인 (dev에선 no-op)
   if (app.isPackaged) initAutoUpdate()

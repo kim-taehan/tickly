@@ -1,36 +1,78 @@
 name: release
 
+# main에 push될 때 package.json version이 아직 릴리스되지 않았으면 새 배포를 생성.
+# (버전을 올리고 main에 push → 자동 배포. 버전 그대로면 빌드 스킵.)
 on:
   push:
-    tags: ['v*']
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      release: ${{ steps.v.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "v$VER 이미 존재 → 빌드 스킵"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "v$VER 신규 → 빌드 진행"
+          fi
+
   build:
+    needs: version
+    if: needs.version.outputs.release == 'true'
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm exec electron-vite build
+      # 매트릭스 잡은 빌드만 (publish 안 함 → 릴리스 경합 방지). 산출물을 아티팩트로 업로드.
+      - run: pnpm exec electron-builder --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}
+          path: |
+            release/*.zip
+            release/*.exe
+            release/*.yml
+            release/*.blockmap
+          if-no-files-found: error
 
-      # 플랫폼 자동 감지: macos 러너 → mac(arm64+x64), windows 러너 → win(x64).
-      # --publish always: GitHub Release에 산출물 + 자동업데이트 메타(latest*.yml) 업로드.
-      - run: pnpm exec electron-builder --publish always
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    needs: [version, build]
+    if: needs.version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      # 모든 플랫폼 산출물을 모아 단일 릴리스로 publish (draft 아님).
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.version.outputs.version }}
+          name: Tickly v${{ needs.version.outputs.version }}
+          files: dist/**/*

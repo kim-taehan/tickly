@@ -70,6 +70,11 @@ export function toggleWidget(): boolean {
   return true
 }
 
+// 앱 시작 시 위젯 자동 오픈 (이미 열려있으면 무시)
+export function openWidget(): void {
+  if (!widget) createWidgetWindow()
+}
+
 export function isWidgetOpen(): boolean {
   return widget !== null
 }

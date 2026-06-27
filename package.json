@@ -1,7 +1,7 @@
 {
   "name": "tickly",
   "productName": "Tickly",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Your Personal Korean Stock Watcher",
   "main": "./out/main/index.js",
   "author": "",
