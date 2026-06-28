@@ -55,6 +55,7 @@ export interface AppApi {
   version(): Promise<string>
   checkForUpdates(): Promise<UpdateCheckResult>
   openExternal(url: string): Promise<void>
+  quit(): Promise<void>
 }
 
 declare global {

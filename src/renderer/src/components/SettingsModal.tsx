@@ -7,6 +7,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const [settings, setSettings] = useState<Settings | null>(null)
   const [version, setVersion] = useState('')
   const [updateMsg, setUpdateMsg] = useState('')
+  const [updateUrl, setUpdateUrl] = useState<string | undefined>()
   const [checking, setChecking] = useState(false)
 
   useEffect(() => {
@@ -21,9 +22,13 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const checkUpdate = (): void => {
     setChecking(true)
     setUpdateMsg('')
+    setUpdateUrl(undefined)
     window.tickly.app
       .checkForUpdates()
-      .then((r) => setUpdateMsg(r.message))
+      .then((r) => {
+        setUpdateMsg(r.message)
+        setUpdateUrl(r.status === 'available' ? r.url : undefined)
+      })
       .finally(() => setChecking(false))
   }
 
@@ -77,7 +82,28 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                   {checking ? '확인 중…' : '업데이트 확인'}
                 </button>
               </div>
-              {updateMsg && <p className="mt-2 text-xs text-gray-500">{updateMsg}</p>}
+              {updateMsg && (
+                <div className="mt-2 flex items-center gap-2">
+                  <p className="text-xs text-gray-500">{updateMsg}</p>
+                  {updateUrl && (
+                    <button
+                      onClick={() => window.tickly.app.openExternal(updateUrl)}
+                      className="text-xs px-2 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                      다운로드
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-gray-100">
+              <button
+                onClick={() => window.tickly.app.quit()}
+                className="w-full h-8 rounded-md border border-red-200 text-red-600 text-sm hover:bg-red-50"
+              >
+                프로그램 종료
+              </button>
             </div>
           </div>
         )}

@@ -42,7 +42,8 @@ const news = {
 const appApi = {
   version: (): Promise<string> => ipcRenderer.invoke('app:version'),
   checkForUpdates: (): Promise<UpdateCheckResult> => ipcRenderer.invoke('app:checkForUpdates'),
-  openExternal: (url: string): Promise<void> => ipcRenderer.invoke('app:openExternal', url)
+  openExternal: (url: string): Promise<void> => ipcRenderer.invoke('app:openExternal', url),
+  quit: (): Promise<void> => ipcRenderer.invoke('app:quit')
 }
 
 // 위젯에서 종목 클릭 시 메인이 받는 선택 신호

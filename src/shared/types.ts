@@ -57,8 +57,9 @@ export interface Settings {
 export interface UpdateCheckResult {
   current: string
   latest?: string
-  status: 'dev' | 'latest' | 'downloading' | 'error'
+  status: 'latest' | 'available' | 'error'
   message: string
+  url?: string // 'available'일 때 다운로드 페이지
 }
 
 // 종목 뉴스 한 건. 네이버 m.stock 뉴스 API → 표시용으로 정규화.

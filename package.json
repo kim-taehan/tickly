@@ -1,7 +1,7 @@
 {
   "name": "tickly",
   "productName": "Tickly",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Your Personal Korean Stock Watcher",
   "main": "./out/main/index.js",
   "author": "",
@@ -24,10 +24,6 @@
       "out/**/*",
       "package.json"
     ],
-    "asarUnpack": [
-      "**/*.node"
-    ],
-    "npmRebuild": true,
     "publish": {
       "provider": "github",
       "owner": "kim-taehan",
@@ -65,7 +61,6 @@
     }
   },
   "dependencies": {
-    "better-sqlite3": "^12.11.1",
     "electron-log": "^5.4.4",
     "electron-updater": "^6.8.9",
     "lucide-react": "^1.21.0",
@@ -75,15 +70,12 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "better-sqlite3",
       "electron",
       "esbuild"
     ]
   },
   "devDependencies": {
-    "@electron/rebuild": "^4.0.4",
     "@tailwindcss/vite": "^4.3.1",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

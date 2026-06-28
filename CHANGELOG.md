@@ -5,6 +5,17 @@
 
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/), 버전은 [SemVer](https://semver.org/lang/ko/)를 따릅니다.
 
+## [0.1.1]
+
+### Changed
+- 저장소를 SQLite(better-sqlite3) → 로컬 JSON 파일로 전환. 네이티브 모듈 제거로 설치·크로스플랫폼 빌드 단순화.
+
+### Added
+- 설정에 "프로그램 종료" 버튼
+
+### Fixed
+- 설정의 "업데이트 확인"이 새 버전을 정상 감지하도록 수정 (GitHub API 직접 조회 — 미서명 macOS에서도 동작). 새 버전이 있으면 다운로드 링크 제공.
+
 ## [0.1.0]
 
 ### Added
