@@ -5,6 +5,14 @@
 
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/), 버전은 [SemVer](https://semver.org/lang/ko/)를 따릅니다.
 
+## [0.1.2]
+
+### Changed
+- 위젯 기본 위치를 좌상단으로 변경
+
+### Fixed
+- 설정의 "프로그램 종료"가 위젯 창까지 함께 닫도록 수정
+
 ## [0.1.1]
 
 ### Changed

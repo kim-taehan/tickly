@@ -33,10 +33,10 @@ function createWidgetWindow(): void {
   const width = saved?.width ?? 200
   const height = saved?.height ?? 150
 
-  // 저장 위치 없으면 메인 창이 있는 디스플레이의 우상단에 배치 (다중 모니터 대응)
+  // 저장 위치 없으면 메인 창이 있는 디스플레이의 좌상단에 배치 (다중 모니터 대응)
   const wa = (main ? screen.getDisplayMatching(main.getBounds()) : screen.getPrimaryDisplay()).workArea
-  const x = saved?.x ?? wa.x + wa.width - width - 20
-  const y = saved?.y ?? wa.y + 60
+  const x = saved?.x ?? wa.x + 20
+  const y = saved?.y ?? wa.y + 20
 
   widget = new BrowserWindow({
     width,
