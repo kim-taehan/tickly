@@ -1,10 +1,11 @@
-import type { Quote, SearchItem, Candle } from '../../../shared/types'
+import type { Quote, SearchItem, Candle, NewsItem } from '../../../shared/types'
 import type { QuoteProvider } from './QuoteProvider'
 
 const URL = 'https://polling.finance.naver.com/api/realtime/domestic/stock'
 const SEARCH_URL = 'https://m.stock.naver.com/front-api/search/autoComplete'
 const CHART_URL = 'https://m.stock.naver.com/api/stock'
 const INTRADAY_URL = 'https://api.stock.naver.com/chart/domestic/item'
+const NEWS_URL = 'https://m.stock.naver.com/api/news/stock'
 // UA 없으면 차단됨.
 const UA = 'Mozilla/5.0'
 
@@ -34,6 +35,34 @@ interface NaverSearchItem {
   code: string
   name: string
   typeName: string
+}
+
+interface NaverNewsItem {
+  officeName: string
+  officeId: string
+  articleId: string
+  datetime: string // "YYYYMMDDHHmm" KST
+  title: string
+  body: string
+}
+
+// "YYYYMMDDHHmm" (KST) → ISO 8601 KST "YYYY-MM-DDTHH:mm:00+09:00"
+function toIso(dt: string): string {
+  return `${dt.slice(0, 4)}-${dt.slice(4, 6)}-${dt.slice(6, 8)}T${dt.slice(8, 10)}:${dt.slice(10, 12)}:00+09:00`
+}
+
+// 네이버 뉴스 제목/본문의 HTML 엔티티 디코딩 (React는 텍스트 엔티티를 자동 디코딩하지 않음).
+// ponytail: 흔한 엔티티 + 숫자 엔티티만. 전체 디코더(he 등)는 과함.
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&') // amp 마지막: 이중 디코딩 방지
 }
 
 // ponytail: 종목당 순차 호출. N 작아 충분, 배치 엔드포인트는 느려지면.
@@ -87,5 +116,24 @@ export const naverProvider: QuoteProvider = {
       close: r.currentPrice,
       volume: r.accumulatedTradingVolume
     }))
+  },
+  async getNews(code) {
+    try {
+      const res = await fetch(`${NEWS_URL}/${code}?pageSize=10&page=1`, {
+        headers: { 'User-Agent': UA }
+      })
+      if (!res.ok) return []
+      // 응답은 그룹 배열 — 모든 그룹의 items를 평탄화해 더 많은 헤드라인 노출.
+      const json = (await res.json()) as { items?: NaverNewsItem[] }[]
+      return json.flatMap((g) => g.items ?? []).map((n) => ({
+        title: decodeEntities(n.title),
+        press: n.officeName,
+        summary: decodeEntities(n.body),
+        datetime: toIso(n.datetime),
+        url: `https://n.news.naver.com/article/${n.officeId}/${n.articleId}`
+      }))
+    } catch {
+      return [] // 네트워크/파싱 실패가 패널을 막지 않음
+    }
   }
 }

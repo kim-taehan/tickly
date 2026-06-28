@@ -66,13 +66,22 @@ jobs:
     if: needs.version.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
+      # CHANGELOG.md에서 이번 버전 섹션을 릴리스 본문으로 추출.
+      - name: Extract release notes
+        run: |
+          VER="${{ needs.version.outputs.version }}"
+          awk -v ver="$VER" '$0 ~ "^## \\["ver"\\]"{f=1;next} f&&/^## \[/{exit} f{print}' CHANGELOG.md > notes.md || true
+          if [ ! -s notes.md ]; then echo "Tickly v$VER" > notes.md; fi
+          echo "---- release body ----"; cat notes.md
       # 모든 플랫폼 산출물을 모아 단일 릴리스로 publish (draft 아님).
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.version.outputs.version }}
           name: Tickly v${{ needs.version.outputs.version }}
+          body_path: notes.md
           files: dist/**/*

@@ -4,6 +4,7 @@ import { existsSync } from 'fs'
 import { registerWatchlistIpc } from './ipc/watchlistIpc'
 import { registerSearchIpc } from './ipc/searchIpc'
 import { registerChartIpc } from './ipc/chartIpc'
+import { registerNewsIpc } from './ipc/newsIpc'
 import { registerConditionsIpc } from './ipc/conditionsIpc'
 import { registerAlertsIpc } from './ipc/alertsIpc'
 import { registerSettingsIpc } from './ipc/settingsIpc'
@@ -55,6 +56,7 @@ app.whenReady().then(() => {
   registerWatchlistIpc()
   registerSearchIpc()
   registerChartIpc()
+  registerNewsIpc()
   registerConditionsIpc()
   registerAlertsIpc()
   registerSettingsIpc()

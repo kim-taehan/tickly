@@ -3,6 +3,7 @@ import { rateColor, signed, won } from '../lib/format'
 import StockChart from './StockChart'
 import ConditionPanel from './ConditionPanel'
 import AlertHistoryPanel from './AlertHistoryPanel'
+import NewsPanel from './NewsPanel'
 
 // 우측 상세: 시세 헤더 + 차트 + 조건 + 알림 이력
 export default function DetailPanel({ stock }: { stock: Stock | null }) {
@@ -34,6 +35,7 @@ export default function DetailPanel({ stock }: { stock: Stock | null }) {
           <StockChart code={stock.code} />
         </section>
         <ConditionPanel stock={stock} />
+        <NewsPanel code={stock.code} />
         <AlertHistoryPanel code={stock.code} />
       </div>
     </main>

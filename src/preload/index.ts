@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { Stock, Quote, SearchItem, Candle, Condition, NewCondition, AlertHistory, Settings, UpdateCheckResult } from '../shared/types'
+import type { Stock, Quote, SearchItem, Candle, Condition, NewCondition, AlertHistory, Settings, UpdateCheckResult, NewsItem } from '../shared/types'
 
 const watchlist = {
   list: (): Promise<Stock[]> => ipcRenderer.invoke('watchlist:list'),
@@ -35,9 +35,14 @@ const widget = {
   openMain: (code: string): Promise<void> => ipcRenderer.invoke('widget:openMain', code)
 }
 
+const news = {
+  list: (code: string): Promise<NewsItem[]> => ipcRenderer.invoke('news:list', code)
+}
+
 const appApi = {
   version: (): Promise<string> => ipcRenderer.invoke('app:version'),
-  checkForUpdates: (): Promise<UpdateCheckResult> => ipcRenderer.invoke('app:checkForUpdates')
+  checkForUpdates: (): Promise<UpdateCheckResult> => ipcRenderer.invoke('app:checkForUpdates'),
+  openExternal: (url: string): Promise<void> => ipcRenderer.invoke('app:openExternal', url)
 }
 
 // 위젯에서 종목 클릭 시 메인이 받는 선택 신호
@@ -68,4 +73,4 @@ const quotes = {
 }
 
 // 각 mutation은 갱신된 전체 목록을 반환 → 렌더러는 상태만 교체.
-contextBridge.exposeInMainWorld('tickly', { watchlist, quotes, search, chart, conditions, alerts, settings, widget, main, app: appApi })
+contextBridge.exposeInMainWorld('tickly', { watchlist, quotes, search, chart, conditions, alerts, news, settings, widget, main, app: appApi })

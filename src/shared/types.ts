@@ -61,6 +61,15 @@ export interface UpdateCheckResult {
   message: string
 }
 
+// 종목 뉴스 한 건. 네이버 m.stock 뉴스 API → 표시용으로 정규화.
+export interface NewsItem {
+  title: string // 헤드라인
+  press: string // 언론사 (officeName)
+  summary: string // 요약 본문 일부 (body, 가공 없음 — 렌더러가 CSS로 말줄임)
+  datetime: string // ISO 8601 (KST). 예: "2026-06-28T09:30:00+09:00"
+  url: string // 기사 원문. https://n.news.naver.com/article/{officeId}/{articleId} — main에서 조합
+}
+
 // 알림 이력 한 건.
 export interface AlertHistory {
   id: number

@@ -1,4 +1,4 @@
-import type { Stock, Quote, SearchItem, Candle, Condition, NewCondition, AlertHistory, Settings, UpdateCheckResult } from '../shared/types'
+import type { Stock, Quote, SearchItem, Candle, Condition, NewCondition, AlertHistory, Settings, UpdateCheckResult, NewsItem } from '../shared/types'
 
 export interface WatchlistApi {
   list(): Promise<Stock[]>
@@ -47,9 +47,14 @@ export interface MainApi {
   onSelect(cb: (code: string) => void): () => void
 }
 
+export interface NewsApi {
+  list(code: string): Promise<NewsItem[]>
+}
+
 export interface AppApi {
   version(): Promise<string>
   checkForUpdates(): Promise<UpdateCheckResult>
+  openExternal(url: string): Promise<void>
 }
 
 declare global {
@@ -61,6 +66,7 @@ declare global {
       chart: ChartApi
       conditions: ConditionsApi
       alerts: AlertsApi
+      news: NewsApi
       settings: SettingsApi
       widget: WidgetApi
       main: MainApi
