@@ -5,6 +5,11 @@
 
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/), 버전은 [SemVer](https://semver.org/lang/ko/)를 따릅니다.
 
+## [0.1.4]
+
+### Changed
+- 조회 주기 옵션을 10초·30초·1분·2분·5분·10분으로 변경, 기본값을 1분으로 조정.
+
 ## [0.1.3]
 
 ### Fixed
