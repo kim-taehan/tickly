@@ -1,19 +1,23 @@
-import { app } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import { app, net, Notification, shell } from 'electron'
 import type { UpdateCheckResult } from '../../shared/types'
 import log from './logger'
 
-// GitHub Release를 피드로 자동 업데이트 (publish 설정에서 주소 자동 주입).
-// 다운로드 후 앱 종료 시 설치. macOS는 코드 서명이 있어야 설치까지 적용됨.
+// 미서명 macOS 앱이라 electron-updater 자동 설치(Squirrel.Mac)는 코드 서명 검증에서 항상 실패한다.
+// → 자동 설치 대신 GitHub Releases를 확인해 새 버전이면 알림을 띄우고, 클릭 시 다운로드 페이지를 연다.
+// 무음 자동 설치가 필요하면 코드 서명 + 공증(notarization) 후 electron-updater 복귀.
 export function initAutoUpdate(): void {
-  autoUpdater.logger = log
-  autoUpdater.on('update-available', (i) => log.info(`[update] available ${i.version}`))
-  autoUpdater.on('update-downloaded', (i) => log.info(`[update] downloaded ${i.version} (다음 종료 시 설치)`))
-  autoUpdater.on('error', (e) => log.error('[update] error', e))
-
-  autoUpdater.checkForUpdatesAndNotify()
+  void notifyIfUpdate()
   // ponytail: 4시간마다 재확인. 장시간 켜두는 위젯 특성상 주기 확인이 유용.
-  setInterval(() => autoUpdater.checkForUpdatesAndNotify(), 4 * 60 * 60 * 1000)
+  setInterval(() => void notifyIfUpdate(), 4 * 60 * 60 * 1000)
+}
+
+async function notifyIfUpdate(): Promise<void> {
+  const r = await checkForUpdates()
+  if (r.status !== 'available' || !r.url) return
+  log.info(`[update] available ${r.latest}`)
+  const n = new Notification({ title: `새 버전 ${r.latest}`, body: '클릭하면 다운로드 페이지가 열립니다.' })
+  n.on('click', () => void shell.openExternal(r.url!))
+  n.show()
 }
 
 const RELEASES_API = 'https://api.github.com/repos/kim-taehan/tickly/releases/latest'
@@ -35,7 +39,8 @@ function isNewer(a: string, b: string): boolean {
 export async function checkForUpdates(): Promise<UpdateCheckResult> {
   const current = app.getVersion()
   try {
-    const res = await fetch(RELEASES_API, { headers: { 'User-Agent': 'Tickly' } })
+    // net.fetch: 회사 프록시 self-signed CA 환경에서도 OS 인증서 저장소를 따라 TLS 통과.
+    const res = await net.fetch(RELEASES_API, { headers: { 'User-Agent': 'Tickly' } })
     if (!res.ok) return { current, status: 'error', message: '업데이트 정보를 가져오지 못했습니다.' }
     const json = (await res.json()) as { tag_name?: string; html_url?: string }
     const latest = (json.tag_name ?? '').replace(/^v/, '')

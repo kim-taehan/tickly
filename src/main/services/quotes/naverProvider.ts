@@ -1,5 +1,10 @@
+import { net } from 'electron'
 import type { Quote, SearchItem, Candle, NewsItem } from '../../../shared/types'
 import type { QuoteProvider } from './QuoteProvider'
+
+// 전역 fetch(undici) 대신 Electron net.fetch: OS 인증서 저장소·프록시를 따라
+// 회사 프록시의 self-signed 루트 CA 환경에서도 TLS 검증이 통과한다.
+const fetch = net.fetch
 
 const URL = 'https://polling.finance.naver.com/api/realtime/domestic/stock'
 const SEARCH_URL = 'https://m.stock.naver.com/front-api/search/autoComplete'

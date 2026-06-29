@@ -5,6 +5,12 @@
 
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/), 버전은 [SemVer](https://semver.org/lang/ko/)를 따릅니다.
 
+## [0.1.3]
+
+### Fixed
+- 회사망 등 프록시 환경에서 네이버 시세·검색·차트·뉴스를 못 받아오던 문제 수정 (시스템 인증서 저장소를 따르는 Electron `net.fetch` 사용).
+- 미서명 macOS 앱에서 시작 시 자동 업데이트가 코드서명 오류로 실패하던 문제 수정 — 새 버전 발견 시 알림으로 안내하고 클릭 시 다운로드 페이지를 연다.
+
 ## [0.1.2]
 
 ### Changed
