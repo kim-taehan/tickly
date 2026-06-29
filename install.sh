@@ -26,7 +26,8 @@ echo "🚚 ${APP} 로 설치..."
 rm -rf "$APP"
 mv "$TMP/Tickly.app" "$APP"
 
-# 미서명 앱이라 Gatekeeper quarantine 제거 (설치 사용자 동의 하에)
-xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
+# 미서명 앱이라 Gatekeeper quarantine 제거 (설치 사용자 동의 하에).
+# /usr/bin/xattr 명시: pyenv 등 PATH의 xattr 샤임은 -r 미지원이라 우회.
+/usr/bin/xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
 echo "✅ 설치 완료! Launchpad 또는 /Applications 에서 Tickly 실행"
